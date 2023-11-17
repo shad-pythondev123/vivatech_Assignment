@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SignIn</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        form {
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">SignIn</h1>
+    <form id="signInForm">
+        <input type="email" name="email" placeholder="Email" required><br><br>
+        <input type="password" name="password" placeholder="Password" required><br><br>
+        <button type="submit">Sign In</button>
+    </form>
+
+    <script>
+        document.getElementById('signInForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+            <!-- console.log(formData.get('email') + ':' + formData.get('password')); -->
+            var authHeader = btoa(formData.get('email') + ':' + formData.get('password'));
+            var myHeaders = new Headers();
+            myHeaders.append("Authorization", "Basic " + authHeader);
+            console.log(authHeader)
+            var requestOptions = {
+                method: 'GET',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:8080/user/signIn", requestOptions)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok.');
+                    }
+                    return response.json();
+                })
+                .then(userDetails => {
+                    // Store user details in session storage
+                    sessionStorage.setItem('userDetails', JSON.stringify(userDetails));
+                    alert('Sign In successful!');
+                    // Redirect or perform other actions upon successful sign-in
+                    // Example: window.location.href = 'dashboard.html';
+                })
+                .catch(error => {
+                    alert("Sign In failed! Error: " + error.message);
+                });
+        });
+    </script>
+</body>
+</html>
